@@ -1,3 +1,12 @@
+import db.basic_db_functions as functions
+import db.db_helpers as helpers
+
+conn = helpers.get_connection()
+cursor = conn.cursor()
+test = functions.get_data_one_game(cursor, "quake")
+print(test)
+
+
 # def main():
 #     while True:
 #         to_csv_or_sqlite = input("sollen die Spielenamen und Slugs in eine csv gespeichert werden oder soll eine sqlite Datenbank erstellt werden?\nwenn csv: csv     wenn sqlite: sqlite\n")

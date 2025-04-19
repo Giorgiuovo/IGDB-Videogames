@@ -4,14 +4,20 @@ def extract_insert_data(games_data, mapping):
     link_inserts = {}
 
     for game_data in games_data:
-        game_entry = {"id": game_data["id"]}  # Immer id für INSERT
+        game_entry = {"id": game_data["id"]}
 
         for field, (table, column) in mapping.items():
             data = game_data
             parts = field.split(".")
-            for part in parts:
+            for i, part in enumerate(parts):
                 if isinstance(data, dict) and part in data:
                     data = data[part]
+                elif isinstance(data, list):
+                    if i == len(parts) - 1:
+                        break
+                    else:
+                        data = None
+                        break
                 else:
                     data = None
                     break
@@ -33,9 +39,10 @@ def extract_insert_data(games_data, mapping):
                     else:
                         continue
 
-                    ref_inserts.setdefault(table, set()).add((sub_id, sub_name))
-                    link_table = f"games_{table}"
-                    link_inserts.setdefault(link_table, set()).add((game_data["id"], sub_id))
+                    if sub_id is not None:
+                        ref_inserts.setdefault(table, set()).add((sub_id, sub_name))
+                        link_table = f"games_{table}"
+                        link_inserts.setdefault(link_table, set()).add((game_data["id"], sub_id))
 
         game_inserts.append(game_entry)
 
@@ -43,6 +50,9 @@ def extract_insert_data(games_data, mapping):
 
 
 def insert_game_batches(cursor, games_data):
+    print("Spiele:", len(games_data.get("games", [])))
+    print("Referenzen:", {k: len(v) for k, v in games_data.get("refs", {}).items()})
+    print("Links:", {k: len(v) for k, v in games_data.get("links", {}).items()})
     # Spiele einfügen
     if games_data["games"]:
         columns = sorted({key for game in games_data["games"] for key in game})

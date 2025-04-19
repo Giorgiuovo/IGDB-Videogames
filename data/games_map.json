@@ -1,0 +1,40 @@
+[
+    {"api_name": "igdb", "api_field_name": "id", "table_name": "games", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "name", "table_name": "games", "table_field_name": "name"},
+    {"api_name": "igdb", "api_field_name": "slug", "table_name": "games", "table_field_name": "slug"},
+    {"api_name": "igdb", "api_field_name": "summary", "table_name": "games", "table_field_name": "summary"},
+    {"api_name": "igdb", "api_field_name": "checksum", "table_name": "games", "table_field_name": "checksum"},
+    {"api_name": "igdb", "api_field_name": "url", "table_name": "games", "table_field_name": "url"},
+    {"api_name": "igdb", "api_field_name": "first_release_date", "table_name": "games", "table_field_name": "first_release_date"},
+    {"api_name": "igdb", "api_field_name": "cover.url", "table_name": "games", "table_field_name": "cover_url"},
+    {"api_name": "igdb", "api_field_name": "cover.image_id", "table_name": "games", "table_field_name": "cover_image_id"},
+    {"api_name": "igdb", "api_field_name": "aggregated_rating", "table_name": "games", "table_field_name": "aggregated_rating"},
+    {"api_name": "igdb", "api_field_name": "aggregated_rating_count", "table_name": "games", "table_field_name": "aggregated_rating_count"},
+    {"api_name": "igdb", "api_field_name": "rating", "table_name": "games", "table_field_name": "rating"},
+    {"api_name": "igdb", "api_field_name": "rating_count", "table_name": "games", "table_field_name": "rating_count"},
+    {"api_name": "igdb", "api_field_name": "total_rating", "table_name": "games", "table_field_name": "total_rating"},
+
+    {"api_name": "igdb", "api_field_name": "platforms.id", "table_name": "platforms", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "platforms.name", "table_name": "platforms", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "genres.id", "table_name": "genres", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "genres.name", "table_name": "genres", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "themes.id", "table_name": "themes", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "themes.name", "table_name": "themes", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "game_modes.id", "table_name": "game_modes", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "game_modes.name", "table_name": "game_modes", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "player_perspectives.id", "table_name": "player_perspectives", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "player_perspectives.name", "table_name": "player_perspectives", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "game_engines.id", "table_name": "game_engines", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "game_engines.name", "table_name": "game_engines", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "franchises.id", "table_name": "franchises", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "franchises.name", "table_name": "franchises", "table_field_name": "name"},
+
+    {"api_name": "igdb", "api_field_name": "collections.id", "table_name": "collections", "table_field_name": "id"},
+    {"api_name": "igdb", "api_field_name": "collections.name", "table_name": "collections", "table_field_name": "name"}
+]

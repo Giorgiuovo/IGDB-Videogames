@@ -1,20 +1,22 @@
 import sqlite3
-from pathlib import Path
+import json
+import config
 
-def get_connection():
-    DB_PATH = Path(__file__).resolve().parent.parent / "data" / "games.db"
-    print(DB_PATH)
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA foreign_keys = ON;")
+def get_connection(row = True):
+    conn = sqlite3.connect(config.DB_PATH)
+    if row:
+        conn.row_factory = sqlite3.Row
     return conn
 
-def load_mapping(cursor, api_name):
-    cursor.execute("""
-        SELECT api_field_name, table_name, table_field_name
-        FROM api2db_map
-        WHERE api_name = ?
-    """, (api_name,))
-    return {field: (table, column) for field, table, column in cursor.fetchall()}
+def load_mapping(api_name = "igdb"):
+    with open(config.DB_MAPPING_PATH, "r", encoding="utf-8") as f:
+        mapping_list = json.load(f)
+
+    return {
+        entry["api_field_name"]: (entry["table_name"], entry["table_field_name"])
+        for entry in mapping_list
+        if entry["api_name"] == api_name
+    }
 
 def close_connection(conn):
     conn.commit()

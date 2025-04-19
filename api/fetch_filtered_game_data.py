@@ -1,14 +1,9 @@
-from config import CLIENT_ID, ACCESS_TOKEN, LIMIT
+import config
+import api.api_helpers as helpers
 import requests
 from pathlib import Path
 import csv
 import time
-
-HEADERS = {
-    "Client-ID": CLIENT_ID,
-    "Authorization": f"Bearer {ACCESS_TOKEN}"
-}
-
 
 def load_id_set(filename):
     with open(filename, newline="", encoding="utf-8") as f:
@@ -41,10 +36,10 @@ def fetch_game_data():
                 & ((rating_count > 5) | (aggregated_rating_count > 0))
                 & game_type = (0,4,6,8,9,11);
         sort id asc;
-        limit {LIMIT};
+        limit {config.IGDB_LIMIT};
         offset {offset};
         '''
-        response = requests.post("https://api.igdb.com/v4/games", headers=HEADERS, data=query)
+        response = requests.post("https://api.igdb.com/v4/games", headers=helpers.HEADERS, data=query)
 
         if response.status_code != 200:
             print(f"Fehler: {response.status_code}, Offset: {offset}")
@@ -57,7 +52,7 @@ def fetch_game_data():
         
         all_game_data.extend(data)
         print(f"Offset {offset}: insgesamt {len(all_game_data)} Spiele")
-        offset += LIMIT
+        offset += config.IGDB_LIMIT
 
         time.sleep(0.25)
 

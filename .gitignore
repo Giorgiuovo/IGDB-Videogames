@@ -1,0 +1,12 @@
+# Twitch API Secrets
+igdb_api_config.py
+
+# Datenbank
+*.sqlite
+
+# Systemdateien
+__pycache__/
+*.pyc
+
+# Tests
+test/
