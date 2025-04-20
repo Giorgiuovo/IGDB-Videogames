@@ -1,5 +1,50 @@
 import db.db_helpers as helpers
 
+def get_data(cursor, fields: list, filters: tuple, operators: tuple, filter_values: tuple):
+    query_parts = []
+    params = []
+
+    for i in range(len(filters)):
+        query_parts.append(f"{filters[i]} {operators[i]} ?")
+        params.append(filter_values[i])
+
+    query = f"""
+    SELECT {", ".join(fields)}
+    FROM games
+    {"WHERE " + " AND ".join(query_parts) if query_parts else ""}
+    """
+    
+    cursor.execute(query, params)
+    return [dict(row) for row in cursor.fetchall()]
+    
+
+
+
+
+
+
+
+
+
+def get_filtered_data_all(cursor, main_data: str, filter_data: tuple[str, str, str], sort_data: str):
+    # mapping = helpers.load_mapping()
+    
+    # filtered_refs = set()
+    # for field, (table, column) in mapping.items():
+    #     if table != "games":
+    #         filtered_refs.add(table)
+    
+    cursor.execute(f"""
+        SELECT ?, ?, ?
+        FROM games
+        WHERE ? ? ?
+        
+    """, main_data, filter_data[0], sort_data, filter_data[0], filter_data[1], filter_data[2])
+
+    return [dict(row) for row in cursor.fetchall()]
+    
+
+
 
 def get_data_one_game(cursor, name):
     mapping = helpers.load_mapping()
