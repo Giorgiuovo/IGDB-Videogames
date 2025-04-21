@@ -14,3 +14,5 @@ DB_MAPPING_PATH =  data_path / "db_games_map.json"
 DB_PATH = data_path / "games.sqlite"
 
 QUERY_WHITELIST_PATH = data_path / "db_query_whitelist.json"
+
+PRESET_PATH = data_path / "presets"

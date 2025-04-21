@@ -1,7 +1,25 @@
+
 def extract_insert_data(games_data, mapping):
     game_inserts = []
     ref_inserts = {}
     link_inserts = {}
+    
+    def find_id_name_recursive(data):
+        """Geht rekursiv durch Daten, bis (id, name)-Paare gefunden werden."""
+        results = []
+
+        if isinstance(data, dict):
+            if "id" in data and "name" in data:
+                results.append((data["id"], data["name"]))
+            else:
+                for value in data.values():
+                    results.extend(find_id_name_recursive(value))
+
+        elif isinstance(data, list):
+            for item in data:
+                results.extend(find_id_name_recursive(item))
+
+        return results
 
     for game_data in games_data:
         game_entry = {"id": game_data["id"]}
@@ -9,15 +27,12 @@ def extract_insert_data(games_data, mapping):
         for api_field, table, column in mapping:
             data = game_data
             parts = api_field.split(".")
-            for i, part in enumerate(parts):
+            for part in parts:
                 if isinstance(data, dict) and part in data:
                     data = data[part]
                 elif isinstance(data, list):
-                    if i == len(parts) - 1:
-                        break
-                    else:
-                        data = None
-                        break
+                    # keine tiefergehende Verschachtelung in diesem Fall
+                    break
                 else:
                     data = None
                     break
@@ -28,29 +43,17 @@ def extract_insert_data(games_data, mapping):
             if table == "games":
                 game_entry[column] = data
 
-            elif isinstance(data, list):
-                for entry in data:
-                    if isinstance(entry, int):
-                        sub_id = entry
-                        sub_name = None
-                    elif isinstance(entry, dict):
-                        sub_id = entry.get("id")
-                        sub_name = entry.get("name")
-                    elif isinstance(entry, list):
-                        if isinstance(entry, dict):
-                            sub_id = entry.get("id")
-                            sub_name = entry.get("name")
-                    else:
-                        continue
-
-                    if sub_id is not None:
-                        ref_inserts.setdefault(table, set()).add((sub_id, sub_name))
-                        link_table = f"games_{table}"
-                        link_inserts.setdefault(link_table, set()).add((game_data["id"], sub_id))
+            else:
+                found_entries = find_id_name_recursive(data)
+                for sub_id, sub_name in found_entries:
+                    ref_inserts.setdefault(table, set()).add((sub_id, sub_name))
+                    link_table = f"games_{table}"
+                    link_inserts.setdefault(link_table, set()).add((game_data["id"], sub_id))
 
         game_inserts.append(game_entry)
 
     return game_inserts, ref_inserts, link_inserts
+
 
 
 def insert_game_batches(cursor, games_data):
