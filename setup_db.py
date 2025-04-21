@@ -38,17 +38,20 @@ if __name__ == "__main__":
             
         if input_csv == "j":
             pass
+
         if input_sqlite in ["j", "debug_trotzdem"]: 
             conn = helpers.get_connection(False)
             cursor = conn.cursor()
 
+            # --- INSERTS ---
             # games-Tabelle erstellen
             schema.create_games_table(cursor)
 
-            # Reference- und many to many Tabellen erstellen wenn es gebraucht wird
-            mapping = helpers.load_mapping()
+            # Reference- und many-to-many-Tabellen erstellen, wenn gebraucht
+            mapping = helpers.load_mapping() 
             seen_refs = set()
-            for _, (table, _) in mapping.items():
+
+            for _, table, _ in mapping:
                 if table != "games" and table not in seen_refs:
                     schema.create_reference_and_m2m_tables(cursor, table)
                     seen_refs.add(table)

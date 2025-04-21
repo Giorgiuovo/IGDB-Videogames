@@ -29,7 +29,7 @@ def fetch_game_data():
     while True:
         query = f'''
         fields id, name, slug, summary, checksum, url, platforms.name, genres.name, themes.name, game_modes.name,
-                player_perspectives.name, game_engines.name, franchises.name, collections.name, first_release_date,
+                player_perspectives.name, game_engines.name, franchises.name, collections.name, keywords.name, language_supports.language.name, first_release_date,
                 cover.url, cover.image_id, aggregated_rating, aggregated_rating_count, rating, rating_count, total_rating;
         where platforms = ({allowed_str}) 
                 & ((keywords = null) | (keywords != ({blocked_str})))

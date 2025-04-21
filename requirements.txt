@@ -1,0 +1,6 @@
+# Requires Python >= 3.7
+requests >= 2.0
+pandas >= 1.0
+plotly >= 5.0
+streamlit >= 1.0
+wordcloud >= 1.8

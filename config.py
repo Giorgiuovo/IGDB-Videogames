@@ -9,5 +9,8 @@ IGDB_CLIENT_ID = igdb_api_config.IGDB_CLIENT_ID
 IGDB_CLIENT_SECRET = igdb_api_config.IGDB_CLIENT_SECRET
 IGDB_LIMIT = 500  # IGDB-Maximum pro Anfrage
 
-DB_MAPPING_PATH = Path(__file__).resolve().parent / "data" / "games_map.json"
-DB_PATH = Path(__file__).resolve().parent / "data" / "games.sqlite"
+data_path = Path(__file__).resolve().parent / "data"
+DB_MAPPING_PATH =  data_path / "db_games_map.json"
+DB_PATH = data_path / "games.sqlite"
+
+QUERY_WHITELIST_PATH = data_path / "db_query_whitelist.json"

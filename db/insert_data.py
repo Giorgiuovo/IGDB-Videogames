@@ -6,9 +6,9 @@ def extract_insert_data(games_data, mapping):
     for game_data in games_data:
         game_entry = {"id": game_data["id"]}
 
-        for field, (table, column) in mapping.items():
+        for api_field, table, column in mapping:
             data = game_data
-            parts = field.split(".")
+            parts = api_field.split(".")
             for i, part in enumerate(parts):
                 if isinstance(data, dict) and part in data:
                     data = data[part]
@@ -36,6 +36,10 @@ def extract_insert_data(games_data, mapping):
                     elif isinstance(entry, dict):
                         sub_id = entry.get("id")
                         sub_name = entry.get("name")
+                    elif isinstance(entry, list):
+                        if isinstance(entry, dict):
+                            sub_id = entry.get("id")
+                            sub_name = entry.get("name")
                     else:
                         continue
 

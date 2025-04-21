@@ -1,0 +1,93 @@
+{
+    "*": {
+    },
+    "name": {
+      "type": "str",
+      "operators": ["LIKE", "="]
+    },
+    "slug": {
+      "type": "str",
+      "operators": ["LIKE", "="]
+    },
+    "summary": {
+      "type": "str",
+      "operators": ["LIKE", "="]
+    },
+    "url": {
+      "type": "str",
+      "operators": ["LIKE", "="]
+    },
+    "platforms": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "genres": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "themes": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "game_modes": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "player_perspectives": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "game_engines": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "franchises": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "collections": {
+      "type": "str",
+      "operators": ["LIKE", "=", "IN"]
+    },
+    "first_release": {
+      "type": "int",
+      "operators": ["=", "<", ">", "<=", ">=", "BETWEEN"],
+      "min": 0
+    },
+    "cover_url": {
+      "type": "str",
+      "operators": ["LIKE", "="]
+    },
+    "cover_image_id": {
+      "type": "str",
+      "operators": ["="]
+    },
+    "aggregated_rating": {
+      "type": "float",
+      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
+      "min": 0,
+      "max": 100
+    },
+    "aggregated_rating_count": {
+      "type": "int",
+      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
+      "min": 0
+    },
+    "rating": {
+      "type": "float",
+      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
+      "min": 0,
+      "max": 100
+    },
+    "rating_count": {
+      "type": "int",
+      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
+      "min": 0
+    },
+    "total_rating": {
+      "type": "float",
+      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
+      "min": 0,
+      "max": 100
+    }
+  }
