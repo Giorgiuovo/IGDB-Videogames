@@ -1,5 +1,3 @@
-from pathlib import Path
-import json
 from config import DB_PATH
 import api.fetch_filtered_game_data as data
 import db.db_helpers as helpers
