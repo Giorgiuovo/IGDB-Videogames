@@ -50,9 +50,7 @@ def fetch_game_data():
         if not data:
             print("Keine weiteren Spiele gefunden.")
             break
-        for entry in data:
-            if "first_release_date" in entry:
-                entry["first_release_date"] = datetime.fromtimestamp(entry["first_release_date"], tz = timezone.utc).date().isoformat()
+        
         all_game_data.extend(data)
         print(f"Offset {offset}: insgesamt {len(all_game_data)} Spiele")
         offset += config.IGDB_LIMIT

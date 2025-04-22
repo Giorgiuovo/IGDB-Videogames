@@ -57,8 +57,8 @@
       "type": "str",
       "operators": ["LIKE", "=", "IN"]
     },
-    "first_release": {
-      "type": "int",
+    "first_release_date": {
+      "type": "datetime",
       "operators": ["=", "<", ">", "<=", ">=", "BETWEEN"],
       "min": 0
     },

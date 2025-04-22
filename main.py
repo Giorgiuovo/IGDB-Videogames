@@ -1,36 +1,30 @@
-import db.basic_db_functions as functions
+import db.general_db_search as functions
 import db.db_helpers as helpers
+from datetime import datetime
+import csv
+import config
+from pathlib import Path
+import pandas as pd
 
 conn = helpers.get_connection()
 cursor = conn.cursor()
-test = functions.get_data_one_game(cursor, "quake")
-print(test)
+def load_name_set(filename):
+    with open(filename, newline="", encoding="utf-8") as f:
+        return {str(row[1]) for row in csv.reader(f) if row and isinstance(row[1], str)
+}
+platform_names = load_name_set(config.data_path / "filtered_igdb_platforms.csv")
+df = functions.get_data(conn,
+                                   cursor, 
+                                   fields=["platforms.name"], 
+                                   filters=[{"field": "platforms.name", "op": "IN", "value": list(platform_names)},
+                                            {"field": "first_release_date", "op": ">", "value": datetime(2020, 1, 1)}],  
+                                   df = True, 
+                                   group_by=["platforms.name"],  
+                                   aggregation={"average_user_rating": {"field": "rating", "function": "AVG"},
+                                                "average_critic_rating": {"field": "aggregated_rating", "function": "AVG"},
+                                                "Spieleanzahl": {"field": "games.name", "function": "COUNT"}})
 
 
-# def main():
-#     while True:
-#         to_csv_or_sqlite = input("sollen die Spielenamen und Slugs in eine csv gespeichert werden oder soll eine sqlite Datenbank erstellt werden?\nwenn csv: csv     wenn sqlite: sqlite\n")
-
-#         if to_csv_or_sqlite in ("csv", "sqlite"):
-#             break
-#         else:
-#             print("Ungültige Eingabe. Versuche es nochmal.\nwenn csv: csv     wenn sqlite: sqlite")
-
-#     blocked_keywords = load_id_set("filtered_igdb_keywords.csv")
-#     print(f"{len(blocked_keywords)} blockierte Keywords geladen.")
-
-#     allowed_platforms = load_id_set("filtered_igdb_platforms.csv")
-#     print(f"{len(allowed_platforms)} erlaubte Plattformen geladen.")
-
-#     all_game_data = fetch_game_data(blocked_keywords, allowed_platforms)
-
-#     # filename = "hallohallo.json"
-#     # with open(filename, "w", encoding="utf-8") as f:
-#     #     json.dump(all_game_data, f, indent=4, ensure_ascii=False)
-#     if to_csv_or_sqlite == "csv":
-#         save_games_to_csv(all_game_data)
-#     elif to_csv_or_sqlite == "sqlite":
-#         save_games_to_sqlite(all_game_data)
-
+print(df)
 # if __name__ == "__main__":
-#   main()
+#     main()
