@@ -226,16 +226,15 @@ def build_having_clause(having: Having) -> tuple[list[str], list[Union[int, floa
 
 def get_data(
     conn,
-    cursor,
     fields: list[str],
     sort_field: Optional[tuple[str, bool]] = None,
     filters: Optional[Filters] = None,
-    df: bool = False,
+    df: bool = True,
     aggregation: Optional[Aggregation] = None,
     group_by: Optional[GroupBy] = None,
     limit: Optional[int] = None,
     having: Optional[Having] = None,
-    offset: Optional[int] = None
+    offset: Optional[int] = None,
 ) -> Union[tuple[str, list], list[dict]]:
     """
     Executes a dynamic SQL query on the 'games' table with flexible selection, filtering,
@@ -243,7 +242,6 @@ def get_data(
 
     Args:
         conn: SQLite connection object.
-        cursor: SQLite cursor object.
         fields (list[str]): List of database fields to select.
                            Example: ["name", "release_date"] or ["*"] to select all fields.
         sort_field (Optional[tuple[str, bool]]): Tuple of (field name, ascending/descending).
@@ -251,7 +249,7 @@ def get_data(
                            or ("release_date", False) for descending order.
         filters (Optional[list[FilterCondition]]): Conditions for the WHERE clause.
                            Example: [{"field": "release_date", "op": ">", "value": 2010}].
-        df (bool): If True, returns the generated SQL query and parameters (instead of executing it).
+        df (bool): If True, returns a pandas dataframe (instead of executing it and returning the dict).
         aggregation (Optional[Aggregation]): Aggregation definitions (e.g., COUNT, AVG, SUM).
                            Example:
                            {
@@ -325,6 +323,7 @@ def get_data(
 
     if not df:
         try:
+            cursor = conn.cursor()
             cursor.execute(query, params)
             results = [dict(row) for row in cursor.fetchall()]
 
