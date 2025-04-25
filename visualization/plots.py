@@ -58,10 +58,23 @@ class line_chart(chart):
     def __init__(self, 
                  conn, 
                  cursor, 
-                 x, y, fields, title="", x_label=None, y_label=None, sort_field=None, filters=None, aggregation=None, group_by=None, limit=None, having=None, offset=None,
+                 x, 
+                 y, 
+                 fields, 
+                 title="", 
+                 x_label=None, 
+                 y_label=None, 
+                 sort_field=None, 
+                 filters=None, 
+                 aggregation=None, 
+                 group_by=None, 
+                 limit=None, 
+                 having=None, 
+                 offset=None,
                  trendline=False):
         super().__init__(conn, cursor, x, y, fields, title, x_label, y_label, sort_field, filters, aggregation, group_by, limit, having, offset)
         self.trendline = trendline
+    
 
 
         

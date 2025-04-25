@@ -4,7 +4,6 @@ import requests
 from pathlib import Path
 import csv
 import time
-from datetime import datetime, timezone
 
 def load_id_set(filename):
     with open(filename, newline="", encoding="utf-8") as f:
@@ -15,12 +14,12 @@ def format_id_list(id_set):
 
 def fetch_game_data():
     offset = 0
-
+    counter = 1
     DATA_PATH = Path(__file__).resolve().parent.parent / "data"
     blocked_keywords = load_id_set(Path(DATA_PATH) / "filtered_igdb_keywords.csv")
-    print(f"{len(blocked_keywords)} blockierte Keywords geladen.")
+    print(f"{len(blocked_keywords)} blocked keywords loaded.")
     allowed_platforms = load_id_set(Path(DATA_PATH) / "filtered_igdb_platforms.csv")
-    print(f"{len(allowed_platforms)} erlaubte Plattformen geladen.")
+    print(f"{len(allowed_platforms)} allowed platforms loaded")
 
     blocked_str = format_id_list(blocked_keywords)
     allowed_str = format_id_list(allowed_platforms)
@@ -43,18 +42,18 @@ def fetch_game_data():
         response = requests.post("https://api.igdb.com/v4/games", headers=helpers.HEADERS, data=query)
 
         if response.status_code != 200:
-            print(f"Fehler: {response.status_code}, Offset: {offset}")
+            print(f"Error: {response.status_code}, Offset: {offset}")
             break
 
         data = response.json()
         if not data:
-            print("Keine weiteren Spiele gefunden.")
+            print("No further games found")
             break
         
         all_game_data.extend(data)
-        print(f"Offset {offset}: insgesamt {len(all_game_data)} Spiele")
+        print(f"Cycle {counter}: fetched {len(all_game_data)} games in total")
         offset += config.IGDB_LIMIT
-
+        counter += 1
         time.sleep(0.25)
 
     return all_game_data

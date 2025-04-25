@@ -10,7 +10,7 @@ def convert_to_unix(date_input):
     if pd.isna(date_input):
         return None
     if isinstance(date_input, (int, float)) and date_input > 1e9:
-        return date_input  # Ist bereits Unix-Timestamp
+        return date_input
     return int(pd.to_datetime(date_input).timestamp())
 
 def convert_from_unix(unix_timestamp, output_format='datetime'):

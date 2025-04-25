@@ -5,7 +5,7 @@ def extract_insert_data(games_data, mapping):
     link_inserts = {}
     
     def find_id_name_recursive(data):
-        """Geht rekursiv durch Daten, bis (id, name)-Paare gefunden werden."""
+        """goes recursively through data until (id, name) pairs are found"""
         results = []
 
         if isinstance(data, dict):
@@ -31,7 +31,6 @@ def extract_insert_data(games_data, mapping):
                 if isinstance(data, dict) and part in data:
                     data = data[part]
                 elif isinstance(data, list):
-                    # keine tiefergehende Verschachtelung in diesem Fall
                     break
                 else:
                     data = None

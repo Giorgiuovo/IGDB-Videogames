@@ -1,101 +1,325 @@
 {
-    "*": {
-    },
-    "games.name": {
-      "type": "str",
-      "operators": ["LIKE", "="]
-    },
-    "slug": {
-      "type": "str",
-      "operators": ["LIKE", "="]
-    },
-    "summary": {
-      "type": "str",
-      "operators": ["LIKE", "="]
-    },
-    "url": {
-      "type": "str",
-      "operators": ["LIKE", "="]
-    },
-    "keywords.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "languages.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "platforms.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "genres.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "themes.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "game_modes.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "player_perspectives.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "game_engines.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "franchises.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "collections.name": {
-      "type": "str",
-      "operators": ["LIKE", "=", "IN"]
-    },
-    "first_release_date": {
-      "type": "datetime",
-      "operators": ["=", "<", ">", "<=", ">=", "BETWEEN"],
-      "min": 0
-    },
-    "cover_url": {
-      "type": "str",
-      "operators": ["LIKE", "="]
-    },
-    "cover_image_id": {
-      "type": "str",
-      "operators": ["="]
-    },
-    "aggregated_rating": {
-      "type": "float",
-      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
-      "min": 0,
-      "max": 100
-    },
-    "aggregated_rating_count": {
-      "type": "int",
-      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
-      "min": 0
-    },
-    "rating": {
-      "type": "float",
-      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
-      "min": 0,
-      "max": 100
-    },
-    "rating_count": {
-      "type": "int",
-      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
-      "min": 0
-    },
-    "total_rating": {
-      "type": "float",
-      "operators": ["=", ">", "<", ">=", "<=", "BETWEEN"],
-      "min": 0,
-      "max": 100
-    }
+  "games.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "games.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.slug": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.summary": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.checksum": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.url": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.first_release_date": {
+    "type": "datetime",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "cover.url": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "cover.image_id": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "games.aggregated_rating": {
+    "type": "float",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "games.aggregated_rating_count": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "games.rating": {
+    "type": "float",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "games.rating_count": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "games.total_rating": {
+    "type": "float",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "platforms.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "keywords.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "genres.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "themes.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "game_modes.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "player_perspectives.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "game_engines.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "franchises.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "collections.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "language_supports.language.name": {
+    "type": "str",
+    "operators": [
+      "=",
+      "LIKE",
+      "IN"
+    ]
+  },
+  "platforms.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "keywords.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "genres.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "themes.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "game_modes.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "player_perspectives.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "game_engines.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "franchises.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "collections.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
+  },
+  "language_supports.language.id": {
+    "type": "int",
+    "operators": [
+      "=",
+      ">",
+      "<",
+      ">=",
+      "<=",
+      "BETWEEN"
+    ]
   }
+}

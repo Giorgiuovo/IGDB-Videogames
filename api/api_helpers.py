@@ -11,6 +11,7 @@ def get_igdb_access_token():
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+    print("got IGDB-access token")
     return response.json()["access_token"]
 
 HEADERS = {

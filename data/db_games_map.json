@@ -1,46 +1,231 @@
-[
-    {"api_name": "igdb", "api_field_name": "id", "table_name": "games", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "name", "table_name": "games", "table_field_name": "name"},
-    {"api_name": "igdb", "api_field_name": "slug", "table_name": "games", "table_field_name": "slug"},
-    {"api_name": "igdb", "api_field_name": "summary", "table_name": "games", "table_field_name": "summary"},
-    {"api_name": "igdb", "api_field_name": "checksum", "table_name": "games", "table_field_name": "checksum"},
-    {"api_name": "igdb", "api_field_name": "url", "table_name": "games", "table_field_name": "url"},
-    {"api_name": "igdb", "api_field_name": "first_release_date", "table_name": "games", "table_field_name": "first_release_date"},
-    {"api_name": "igdb", "api_field_name": "cover.url", "table_name": "games", "table_field_name": "cover_url"},
-    {"api_name": "igdb", "api_field_name": "cover.image_id", "table_name": "games", "table_field_name": "cover_image_id"},
-    {"api_name": "igdb", "api_field_name": "aggregated_rating", "table_name": "games", "table_field_name": "aggregated_rating"},
-    {"api_name": "igdb", "api_field_name": "aggregated_rating_count", "table_name": "games", "table_field_name": "aggregated_rating_count"},
-    {"api_name": "igdb", "api_field_name": "rating", "table_name": "games", "table_field_name": "rating"},
-    {"api_name": "igdb", "api_field_name": "rating_count", "table_name": "games", "table_field_name": "rating_count"},
-    {"api_name": "igdb", "api_field_name": "total_rating", "table_name": "games", "table_field_name": "total_rating"},
-
-    {"api_name": "igdb", "api_field_name": "platforms.id", "table_name": "platforms", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "platforms.name", "table_name": "platforms", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "keywords.id", "table_name": "keywords", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "keywords.name", "table_name": "keywords", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "genres.id", "table_name": "genres", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "genres.name", "table_name": "genres", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "themes.id", "table_name": "themes", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "themes.name", "table_name": "themes", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "game_modes.id", "table_name": "game_modes", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "game_modes.name", "table_name": "game_modes", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "player_perspectives.id", "table_name": "player_perspectives", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "player_perspectives.name", "table_name": "player_perspectives", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "game_engines.id", "table_name": "game_engines", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "game_engines.name", "table_name": "game_engines", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "franchises.id", "table_name": "franchises", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "franchises.name", "table_name": "franchises", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "collections.id", "table_name": "collections", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "collections.name", "table_name": "collections", "table_field_name": "name"},
-
-    {"api_name": "igdb", "api_field_name": "language_supports.language.id", "table_name": "languages", "table_field_name": "id"},
-    {"api_name": "igdb", "api_field_name": "language_supports.language.name", "table_name": "languages", "table_field_name": "name"}
-]
+{
+  "api_name": "igdb",
+  "tables": {
+    "games": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "id"},
+        "name": {"type": "text", "api_field": "name"},
+        "slug": {"type": "text", "api_field": "slug"},
+        "summary": {"type": "text", "api_field": "summary"},
+        "checksum": {"type": "text", "api_field": "checksum"},
+        "url": {"type": "text", "api_field": "url"},
+        "first_release_date": {"type": "datetime", "api_field": "first_release_date"},
+        "cover_url": {"type": "text", "api_field": "cover.url"},
+        "cover_image_id": {"type": "text", "api_field": "cover.image_id"},
+        "aggregated_rating": {"type": "float", "api_field": "aggregated_rating"},
+        "aggregated_rating_count": {"type": "integer", "api_field": "aggregated_rating_count"},
+        "rating": {"type": "float", "api_field": "rating"},
+        "rating_count": {"type": "integer", "api_field": "rating_count"},
+        "total_rating": {"type": "float", "api_field": "total_rating"}
+      },
+      "relations": {
+        "platforms": {
+          "type": "many_to_many",
+          "join_table": "games_platforms",
+          "join_fields": {"game_id": "platform_id"},
+          "target_table": "platforms",
+          "api_field": "platforms"
+        },
+        "keywords": {
+          "type": "many_to_many",
+          "join_table": "games_keywords",
+          "join_fields": {"game_id": "keyword_id"},
+          "target_table": "keywords",
+          "api_field": "keywords"
+        },
+        "genres": {
+          "type": "many_to_many",
+          "join_table": "games_genres",
+          "join_fields": {"game_id": "genre_id"},
+          "target_table": "genres",
+          "api_field": "genres"
+        },
+        "themes": {
+          "type": "many_to_many",
+          "join_table": "games_themes",
+          "join_fields": {"game_id": "theme_id"},
+          "target_table": "themes",
+          "api_field": "themes"
+        },
+        "game_modes": {
+          "type": "many_to_many",
+          "join_table": "games_game_modes",
+          "join_fields": {"game_id": "game_mode_id"},
+          "target_table": "game_modes",
+          "api_field": "game_modes"
+        },
+        "player_perspectives": {
+          "type": "many_to_many",
+          "join_table": "games_player_perspectives",
+          "join_fields": {"game_id": "player_perspective_id"},
+          "target_table": "player_perspectives",
+          "api_field": "player_perspectives"
+        },
+        "game_engines": {
+          "type": "many_to_many",
+          "join_table": "games_game_engines",
+          "join_fields": {"game_id": "game_engine_id"},
+          "target_table": "game_engines",
+          "api_field": "game_engines"
+        },
+        "franchises": {
+          "type": "many_to_many",
+          "join_table": "games_franchises",
+          "join_fields": {"game_id": "franchise_id"},
+          "target_table": "franchises",
+          "api_field": "franchises"
+        },
+        "collections": {
+          "type": "many_to_many",
+          "join_table": "games_collections",
+          "join_fields": {"game_id": "collection_id"},
+          "target_table": "collections",
+          "api_field": "collections"
+        },
+        "languages": {
+          "type": "many_to_many",
+          "join_table": "games_languages",
+          "join_fields": {"game_id": "language_id"},
+          "target_table": "languages",
+          "api_field": "language_supports.language"
+        }
+      }
+    },
+    "platforms": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "platforms.id"},
+        "name": {"type": "text", "api_field": "platforms.name"}
+      }
+    },
+    "keywords": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "keywords.id"},
+        "name": {"type": "text", "api_field": "keywords.name"}
+      }
+    },
+    "genres": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "genres.id"},
+        "name": {"type": "text", "api_field": "genres.name"}
+      }
+    },
+    "themes": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "themes.id"},
+        "name": {"type": "text", "api_field": "themes.name"}
+      }
+    },
+    "game_modes": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "game_modes.id"},
+        "name": {"type": "text", "api_field": "game_modes.name"}
+      }
+    },
+    "player_perspectives": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "player_perspectives.id"},
+        "name": {"type": "text", "api_field": "player_perspectives.name"}
+      }
+    },
+    "game_engines": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "game_engines.id"},
+        "name": {"type": "text", "api_field": "game_engines.name"}
+      }
+    },
+    "franchises": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "franchises.id"},
+        "name": {"type": "text", "api_field": "franchises.name"}
+      }
+    },
+    "collections": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "collections.id"},
+        "name": {"type": "text", "api_field": "collections.name"}
+      }
+    },
+    "languages": {
+      "primary_key": "id",
+      "fields": {
+        "id": {"type": "integer", "api_field": "language_supports.language.id"},
+        "name": {"type": "text", "api_field": "language_supports.language.name"}
+      }
+    }
+  },
+  "join_tables": {
+    "games_platforms": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "platform_id": {"type": "integer", "foreign_key": "platforms.id"}
+      }
+    },
+    "games_keywords": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "keyword_id": {"type": "integer", "foreign_key": "keywords.id"}
+      }
+    },
+    "games_genres": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "genre_id": {"type": "integer", "foreign_key": "genres.id"}
+      }
+    },
+    "games_themes": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "theme_id": {"type": "integer", "foreign_key": "themes.id"}
+      }
+    },
+    "games_game_modes": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "game_mode_id": {"type": "integer", "foreign_key": "game_modes.id"}
+      }
+    },
+    "games_player_perspectives": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "player_perspective_id": {"type": "integer", "foreign_key": "player_perspectives.id"}
+      }
+    },
+    "games_game_engines": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "game_engine_id": {"type": "integer", "foreign_key": "game_engines.id"}
+      }
+    },
+    "games_franchises": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "franchise_id": {"type": "integer", "foreign_key": "franchises.id"}
+      }
+    },
+    "games_collections": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "collection_id": {"type": "integer", "foreign_key": "collections.id"}
+      }
+    },
+    "games_languages": {
+      "fields": {
+        "game_id": {"type": "integer", "foreign_key": "games.id"},
+        "language_id": {"type": "integer", "foreign_key": "languages.id"}
+      }
+    }
+  },
+  "field_aliases": {
+    "languages.name": "languages.name"
+  }
+}

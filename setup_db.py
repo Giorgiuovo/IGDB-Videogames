@@ -1,4 +1,4 @@
-from config import DB_PATH
+import config
 import api.fetch_filtered_game_data as data
 import db.db_helpers as helpers
 import db.schema as schema
@@ -6,31 +6,31 @@ import db.insert_data as insert
 
 if __name__ == "__main__":
     while True:
-        input_csv = input("soll eine csv Tabelle erstellt werden? (j/n): ")
+        input_csv = input("do you want to generate a .csv export? (j/n): ")
         if input_csv in ["j", "n"]:
             break
         else:
-            print("Ungültige Eingabe, versuche es nochmal")
+            print("Invalid Input, try again")
 
     while True:
-        input_sqlite = input("soll eine SQLite Datenbank erstellt werden? (j/n): ")
+        input_sqlite = input("should an SQLite database be created? (j/n): ")
         if input_sqlite in ["j", "n", "debug_trotzdem"]:
-            if input_sqlite in ["j", "debug_trotzdem"] and not DB_PATH.exists():
+            if input_sqlite in ["j", "debug_trotzdem"] and not config.DB_PATH.exists():
                 break
             elif input_sqlite == "debug_trotzdem":
-                DB_PATH.unlink()
+                config.DB_PATH.unlink()
                 break
             elif input_sqlite == "n":
                 break
             else:
-                print("Datenbank schon vorhanden. SQLite-Setup abgebrochen.")
+                print("Database already exists. SQLite setup canceled.")
                 input_sqlite = "n"
                 break
         else:         
-            print("Ungültige Eingabe, versuche es nochmal")
+            print("Invalid Input, try again")
 
     if input_csv == "n" and input_sqlite == "n":
-        print("Setup abgebrochen")
+        print("Setup canceled")
     else:
         all_game_data = data.fetch_game_data()
             
@@ -41,12 +41,12 @@ if __name__ == "__main__":
             conn = helpers.get_connection(False)
             cursor = conn.cursor()
 
-            # --- INSERTS ---
-            # games-Tabelle erstellen
+            # --- SCHEMA ---
+            # create games-table
             schema.create_games_table(cursor)
 
-            # Reference- und many-to-many-Tabellen erstellen, wenn gebraucht
-            mapping = helpers.load_mapping() 
+            # Create reference and many-to-many tables, if required
+            mapping = helpers.load_mapping(config.DB_MAPPING_PATH) 
             seen_refs = set()
 
             for _, table, _ in mapping:
@@ -65,4 +65,8 @@ if __name__ == "__main__":
 
             insert.insert_game_batches(cursor, games_data)
 
+            config.QUERY_WHITELIST_PATH.unlink()
+            helpers.generate_whitelist_from_mapping(config.DB_MAPPING_PATH, config.QUERY_WHITELIST_PATH)
+
+            print("Setup finished")
             helpers.close_connection(conn)
