@@ -296,7 +296,7 @@ def get_data(
     validate_get_data_input(fields, sort_field_name, filters, aggregation, group_by, limit, having, offset)
 
     used_fields = set(fields) | {f['field'] for f in filters} | set(group_by) | {v['field'] for v in aggregation.values()}
-    mapping = helpers.load_mapping()
+    mapping = helpers.load_mapping(config.DB_MAPPING_PATH)
     field_table_map = {e[0]: e[1] for e in mapping}
     field_table_map["languages.name"] = "languages"
 

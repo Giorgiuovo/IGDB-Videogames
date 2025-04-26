@@ -1,0 +1,20 @@
+{
+    "version": 1.0,
+    "plots": {
+        "line_chart": {
+            "web_name": "Line Chart 📈",
+            "plot_attributes": {
+                "title": {"mandatory": false, "input_title": "Plottitle", "input_type": "text_input"},
+                "x_label": {"mandatory": false, "input_title": "X-axis-label", "input_type": "text_input"},
+                "x": {"mandatory": false, "input_title": "X-axis-field", "input_type": "fields"},
+                "y": {"mandatory": false, "input_title": "Y-axis-field", "input_type": "fields"},
+                "y_label": {"mandatory": false, "input_title": "Y-axis-label", "input_type": "text_input"}, 
+                "trendline": {"mandatory": false, "input_title": "Plottitle", "input_type": "checkbox"}
+            },
+            "basic-field-attributes": {
+                
+
+            }
+        }
+ 
+}

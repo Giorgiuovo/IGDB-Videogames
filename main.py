@@ -1,30 +1,26 @@
-import db.general_db_search as functions
-import db.db_helpers as helpers
-from datetime import datetime
-import csv
-import config
-from pathlib import Path
-import pandas as pd
+from config import PRESET_PATH as preset_path
+import pathlib
+import streamlit as st  
 
-conn = helpers.get_connection()
-cursor = conn.cursor()
-def load_name_set(filename):
-    with open(filename, newline="", encoding="utf-8") as f:
-        return {str(row[1]) for row in csv.reader(f) if row and isinstance(row[1], str)
-}
-platform_names = load_name_set(config.data_path / "filtered_igdb_platforms.csv")
-df = functions.get_data(conn,
-                                   cursor, 
-                                   fields=["platforms.name"], 
-                                   filters=[{"field": "platforms.name", "op": "IN", "value": list(platform_names)},
-                                            {"field": "first_release_date", "op": ">", "value": datetime(2020, 1, 1)}],  
-                                   df = True, 
-                                   group_by=["platforms.name"],  
-                                   aggregation={"average_user_rating": {"field": "rating", "function": "AVG"},
-                                                "average_critic_rating": {"field": "aggregated_rating", "function": "AVG"},
-                                                "Spieleanzahl": {"field": "games.name", "function": "COUNT"}})
+def show():
+    st.set_page_config(layout = "wide")
+
+    presets, middle_space, search = st.columns([0.15, 0.7, 0.15])
+
+    with presets:
+        st.selectbox("select Preset", ["Unsaved preset"] if not any(preset_path.iterdir()) else ["Unsaved Preset"] + [f.stem for f in preset_path.iterdir() if f.is_file()])
+
+    with search:
+        st.text_input("search")
+    
+    add_page_link, rightspace = st.columns([0.2, 0.8])
+    with add_page_link:
+        st.page_link("pages/add_page.py", label = "Add new plot", icon = "➕", use_container_width=True)
+
+    
 
 
-print(df)
+if __name__ == "__main__":
+    show()
 # if __name__ == "__main__":
 #     main()

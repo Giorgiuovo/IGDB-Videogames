@@ -4,7 +4,7 @@ class chart:
                  cursor, 
                  x, 
                  y, 
-                 fields,
+                 extra_fields,
                  title="", 
                  x_label=None, 
                  y_label=None, 
@@ -20,7 +20,7 @@ class chart:
         self.cursor = cursor
         self.x = x
         self.y = y
-        self.fields = fields
+        self.fields = extra_fields
         self.title = title
         self.x_label = x_label
         self.y_label = y_label
@@ -35,7 +35,7 @@ class chart:
     def get_query_args(self):
         return {
             "conn": self.conn,
-            "fields": self.fields,
+            "fields": self.extra_fields,
             "sort_field": self.sort_field,
             "filters": self.filters,
             "aggregation": self.aggregation,
@@ -60,7 +60,7 @@ class line_chart(chart):
                  cursor, 
                  x, 
                  y, 
-                 fields, 
+                 extra_fields, 
                  title="", 
                  x_label=None, 
                  y_label=None, 
@@ -72,7 +72,7 @@ class line_chart(chart):
                  having=None, 
                  offset=None,
                  trendline=False):
-        super().__init__(conn, cursor, x, y, fields, title, x_label, y_label, sort_field, filters, aggregation, group_by, limit, having, offset)
+        super().__init__(conn, cursor, x, y, extra_fields, title, x_label, y_label, sort_field, filters, aggregation, group_by, limit, having, offset)
         self.trendline = trendline
     
 
