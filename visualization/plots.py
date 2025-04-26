@@ -4,7 +4,7 @@ class chart:
                  cursor, 
                  x, 
                  y, 
-                 extra_fields,
+                 extra_fields=None,
                  title="", 
                  x_label=None, 
                  y_label=None, 

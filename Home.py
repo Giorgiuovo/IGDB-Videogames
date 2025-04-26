@@ -4,7 +4,7 @@ import streamlit as st
 
 def show():
     st.set_page_config(layout = "wide")
-
+    st.write("This is a sample")
     presets, middle_space, search = st.columns([0.15, 0.7, 0.15])
 
     with presets:
@@ -15,7 +15,7 @@ def show():
     
     add_page_link, rightspace = st.columns([0.2, 0.8])
     with add_page_link:
-        st.page_link("pages/add_page.py", label = "Add new plot", icon = "➕", use_container_width=True)
+        st.page_link("pages/Add Plot.py", label = "Add new plot", icon = "➕", use_container_width=True)
 
     
 

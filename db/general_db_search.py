@@ -65,8 +65,8 @@ def validate_get_data_input(
     if not fields:
         raise ValueError("Field is missing")
 
-    if fields == ["*"] and len(fields) > 1:
-        raise ValueError("Cannot select * and another field")
+    if fields == ["*"]:
+        raise ValueError("Wildcard not allowed")
 
     with open(config.QUERY_WHITELIST_PATH, "r", encoding="utf-8") as f:
         whitelist = json.load(f)
@@ -232,8 +232,8 @@ def get_data(
     df: bool = True,
     aggregation: Optional[Aggregation] = None,
     group_by: Optional[GroupBy] = None,
-    limit: Optional[int] = None,
     having: Optional[Having] = None,
+    limit: Optional[int] = None,
     offset: Optional[int] = None,
 ) -> Union[tuple[str, list], list[dict]]:
     """
