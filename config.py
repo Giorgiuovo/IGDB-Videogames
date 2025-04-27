@@ -17,4 +17,3 @@ QUERY_WHITELIST_PATH = DATA_PATH / "db_query_whitelist.json"
 
 PRESET_PATH = DATA_PATH / "presets"
 CHART_TYPES_PATH = DATA_PATH / "chart_types.json"
-UNSAVED_PRESET_PATH = DATA_PATH / "presets" / "unsaved_presets"
