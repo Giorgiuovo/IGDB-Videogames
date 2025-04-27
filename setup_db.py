@@ -6,16 +6,16 @@ import db.insert_data as insert
 
 if __name__ == "__main__":
     while True:
-        input_csv = input("do you want to generate a .csv export? (j/n): ")
-        if input_csv in ["j", "n"]:
+        input_csv = input("do you want to generate a .csv export? (y/n): ")
+        if input_csv in ["y", "n"]:
             break
         else:
             print("Invalid Input, try again")
 
     while True:
-        input_sqlite = input("should an SQLite database be created? (j/n): ")
-        if input_sqlite in ["j", "n", "debug_trotzdem"]:
-            if input_sqlite in ["j", "debug_trotzdem"] and not config.DB_PATH.exists():
+        input_sqlite = input("should an SQLite database be created? (y/n): ")
+        if input_sqlite in ["y", "n", "debug_trotzdem"]:
+            if input_sqlite in ["y", "debug_trotzdem"] and not config.DB_PATH.exists():
                 break
             elif input_sqlite == "debug_trotzdem":
                 config.DB_PATH.unlink()
@@ -34,10 +34,10 @@ if __name__ == "__main__":
     else:
         all_game_data = data.fetch_game_data()
             
-        if input_csv == "j":
+        if input_csv == "y":
             pass
 
-        if input_sqlite in ["j", "debug_trotzdem"]: 
+        if input_sqlite in ["y", "debug_trotzdem"]: 
             conn = helpers.get_connection(False)
             cursor = conn.cursor()
 
@@ -65,8 +65,10 @@ if __name__ == "__main__":
 
             insert.insert_game_batches(cursor, games_data)
 
-            config.QUERY_WHITELIST_PATH.unlink()
-            helpers.generate_whitelist_from_mapping(config.DB_MAPPING_PATH, config.QUERY_WHITELIST_PATH)
+            #config.QUERY_WHITELIST_PATH.unlink()
+            #helpers.generate_whitelist_from_mapping(config.DB_MAPPING_PATH, config.QUERY_WHITELIST_PATH)
+            config.PRESET_PATH.mkdir(exist_ok=True)
+
 
             print("Setup finished")
             helpers.close_connection(conn)
