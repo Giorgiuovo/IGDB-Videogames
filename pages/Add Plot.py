@@ -278,102 +278,104 @@ def show():
             "Choose a plottype",
             options=available_plot_types,
             format_func=lambda x: chart_types[x]["web_name"],
-            key="plot_type_select"
+            key="plot_type_select",
+            index=None,
+            placeholder = "---Please select---"
         )
+    if plot_type:
+        # Combine parameters
+        basic_plot_params = chart_types["basic"]["parameters"].get("plot", {})
+        basic_query_params = chart_types["basic"]["parameters"].get("query", {})
+        selected_plot_params = chart_types[plot_type]["parameters"].get("plot", {})
+        selected_query_params = chart_types[plot_type]["parameters"].get("query", {})
 
-    # Combine parameters
-    basic_plot_params = chart_types["basic"]["parameters"].get("plot", {})
-    basic_query_params = chart_types["basic"]["parameters"].get("query", {})
-    selected_plot_params = chart_types[plot_type]["parameters"].get("plot", {})
-    selected_query_params = chart_types[plot_type]["parameters"].get("query", {})
-
-    combined_parameters = {
-        "plot": {**basic_plot_params, **selected_plot_params},
-        "query": {**basic_query_params, **selected_query_params}
-    }
-
-    # Render configuration sections
-    with st.expander("Plot configuration"):
-        render_options("plot", combined_parameters, whitelist, whitelisted_webnames)
-
-    with st.expander("Query configuration"):
-        render_options("query", combined_parameters, whitelist, whitelisted_webnames)
-
-    # Build temp_config from session state
-    temp_config = {
-        "plot_type": plot_type,
-        "plot_settings": {},
-        "query_settings": {
-            "filters": st.session_state.get("filters", []),
-            "aggregation_havings": st.session_state.get("aggregation_havings", []),
-            "sort": st.session_state.get("sort_fields", []),
-            "group_by": st.session_state.get("group_by", []),
-            "limit": st.session_state.get("limit", None),
-            "offset": st.session_state.get("offset", None)
+        combined_parameters = {
+            "plot": {**basic_plot_params, **selected_plot_params},
+            "query": {**basic_query_params, **selected_query_params}
         }
-    }
 
-    # Add simple fields to temp_config
-    for param in combined_parameters["plot"]:
-        if combined_parameters["plot"][param]["input_type"] in ["text_input", "number_input", "checkbox"]:
-            temp_config["plot_settings"][param] = st.session_state.get(f"plot_{param}")
-        elif combined_parameters["plot"][param]["input_type"] == "field_selector":
-            temp_config["plot_settings"][param] = translate_webname(st.session_state.get(f"plot_{param}"), whitelist)
+        # Render configuration sections
+        with st.expander("Plot configuration"):
+            render_options("plot", combined_parameters, whitelist, whitelisted_webnames)
 
-    for param in combined_parameters["query"]:
-        if combined_parameters["query"][param]["input_type"] in ["text_input", "number_input", "checkbox"]:
-            temp_config["query_settings"][param] = st.session_state.get(f"query_{param}")
-        elif combined_parameters["query"][param]["input_type"] == "field_list_selector":
-            temp_config["query_settings"][param] = [translate_webname(f, whitelist) 
-                                                  for f in st.session_state.get(f"query_{param}", [])]
+        with st.expander("Query configuration"):
+            render_options("query", combined_parameters, whitelist, whitelisted_webnames)
 
-    # Preview and actions
-    st.subheader("Preview of current configuration:")
-    st.json(temp_config)
+        # Build temp_config from session state
+        temp_config = {
+            "plot_type": plot_type,
+            "plot_settings": {},
+            "query_settings": {
+                "filters": st.session_state.get("filters", []),
+                "aggregation_havings": st.session_state.get("aggregation_havings", []),
+                "sort": st.session_state.get("sort_fields", []),
+                "group_by": st.session_state.get("group_by", []),
+                "limit": st.session_state.get("limit", None),
+                "offset": st.session_state.get("offset", None)
+            }
+        }
 
-    if st.button("Reset"):
-        for key in list(st.session_state.keys()):
-            if key not in ["preset", "pos"]:  # Keep these for navigation
-                del st.session_state[key]
-        st.rerun()
+        # Add simple fields to temp_config
+        for param in combined_parameters["plot"]:
+            if combined_parameters["plot"][param]["input_type"] in ["text_input", "number_input", "checkbox"]:
+                temp_config["plot_settings"][param] = st.session_state.get(f"plot_{param}")
+            elif combined_parameters["plot"][param]["input_type"] == "field_selector":
+                temp_config["plot_settings"][param] = translate_webname(st.session_state.get(f"plot_{param}"), whitelist)
 
-    if st.button("Save configuration and add to page"):
-        # Validate required fields
-        errors = []
-        for param, options in combined_parameters["plot"].items():
-            if options.get("required") and not temp_config["plot_settings"].get(param):
-                errors.append(f"Plot: '{options['label']}' is required!")
-        
-        for param, options in combined_parameters["query"].items():
-            if options.get("required") and not temp_config["query_settings"].get(param):
-                errors.append(f"Query: '{options['label']}' is required!")
+        for param in combined_parameters["query"]:
+            if combined_parameters["query"][param]["input_type"] in ["text_input", "number_input", "checkbox"]:
+                temp_config["query_settings"][param] = st.session_state.get(f"query_{param}")
+            elif combined_parameters["query"][param]["input_type"] == "field_list_selector":
+                temp_config["query_settings"][param] = [translate_webname(f, whitelist) 
+                                                    for f in st.session_state.get(f"query_{param}", [])]
 
-        if errors:
-            for error in errors:
-                st.error(error)
-        else:
-            def append_to_json_file(path, key, new_entry):
-                try:
-                    with open(path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                except (FileNotFoundError, json.JSONDecodeError):
-                    data = {}
+        # Preview and actions
+        st.subheader("Preview of current configuration:")
+        st.json(temp_config)
 
-                data[key] = new_entry
+        if st.button("Reset"):
+            for key in list(st.session_state.keys()):
+                if key not in ["preset", "pos"]:  # Keep these for navigation
+                    del st.session_state[key]
+            st.rerun()
 
-                with open(path, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4)
+        if st.button("Save configuration and add to page"):
+            # Validate required fields
+            errors = []
+            for param, options in combined_parameters["plot"].items():
+                if options.get("required") and not temp_config["plot_settings"].get(param):
+                    errors.append(f"Plot: '{options['label']}' is required!")
+            
+            for param, options in combined_parameters["query"].items():
+                if options.get("required") and not temp_config["query_settings"].get(param):
+                    errors.append(f"Query: '{options['label']}' is required!")
 
-            clean_temp_config = clean_config(temp_config)
-            append_to_json_file(
-                f"{config.PRESET_PATH}/{st.session_state.preset}.json",
-                st.session_state.pos,
-                clean_temp_config
-            )
-            st.success("Configuration saved!")
-            time.sleep(1.2)
-            del temp_config
-            st.switch_page("Home.py")
+            if errors:
+                for error in errors:
+                    st.error(error)
+            else:
+                def append_to_json_file(path, key, new_entry):
+                    try:
+                        with open(path, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                    except (FileNotFoundError, json.JSONDecodeError):
+                        data = {}
+
+                    data[key] = new_entry
+
+                    with open(path, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=4)
+
+                clean_temp_config = clean_config(temp_config)
+                append_to_json_file(
+                    f"{config.PRESET_PATH}/{st.session_state.preset}.json",
+                    st.session_state.pos,
+                    clean_temp_config
+                )
+                st.success("Configuration saved!")
+                time.sleep(1.2)
+                del temp_config
+                st.switch_page("Home.py")
 
 if __name__ == "__main__":
     show()
