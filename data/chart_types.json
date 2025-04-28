@@ -7,8 +7,7 @@
           "title": {"required": false, "label": "Plot Title", "input_type": "text_input"}
         },
         "query": {
-          "extra_fields": {"required": false, "label": "Information Fields", "input_type": "field_list_selector"},
-          "sort_field": {"required": false, "label": "Sort by", "input_type": "sort_selector"},
+          "sort_fields": {"required": false, "label": "Sort by", "input_type": "sort_selector"},
           "filters": {"required": false, "label": "Filter by", "input_type": "filter_selector"},
           "group_by": {"required": false, "label": "Group by", "input_type": "field_list_selector"},
           "aggregation": {

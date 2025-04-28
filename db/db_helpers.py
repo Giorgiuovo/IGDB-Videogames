@@ -3,20 +3,11 @@ import json
 import config
 
 def get_connection(row = True):
-    conn = sqlite3.connect(config.DB_PATH)
+    conn = sqlite3.connect(config.DB_PATH, check_same_thread=False)
     if row:
         conn.row_factory = sqlite3.Row
     return conn
 
-# def old_load_mapping(api_name="igdb"):
-#     with open(config.DB_MAPPING_PATH, encoding="utf-8") as f:
-#         mapping_list = json.load(f)
-
-#     return [
-#         (e["api_field_name"], e["table_name"], e["table_field_name"])
-#         for e in mapping_list
-#         if e["api_name"] == api_name
-#    ]
 def generate_whitelist_from_mapping(mapping_path, output_path):
     with open(mapping_path, encoding="utf-8") as f:
         mapping = json.load(f)

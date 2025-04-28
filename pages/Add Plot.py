@@ -59,12 +59,12 @@ def render_filter_selector(plot_query: str, param: str, whitelist: dict, whiteli
     
     if field:
         allowed_ops = whitelist[field]["operators"] 
-        operator = st.selectbox("Select operator", allowed_ops, key=f"{plot_query}_{param}_operator")
+        op = st.selectbox("Select operator", allowed_ops, key=f"{plot_query}_{param}_operator")
         
         value_type = whitelist[field]["type"]
         value = None
 
-        if operator == "BETWEEN":
+        if op == "BETWEEN":
             if value_type in ["int", "float"]:
                 val1 = st.number_input("Value (from)", key=f"{plot_query}_{param}_{field}_between_1")
                 val2 = st.number_input("Value (to)", key=f"{plot_query}_{param}_{field}_between_2")
@@ -89,7 +89,7 @@ def render_filter_selector(plot_query: str, param: str, whitelist: dict, whiteli
                     st.session_state.filters = []
                 st.session_state.filters.append({
                     "field": field,
-                    "operator": operator,
+                    "op": op,
                     "value": value
                 })
                 st.success("Filter added!")
@@ -104,7 +104,7 @@ def render_filter_selector(plot_query: str, param: str, whitelist: dict, whiteli
             with cols[0]:
                 field_info = whitelist.get(f['field'], {})
                 webname = field_info.get('webname', f['field'])
-                st.write(f"{webname} {f['operator']} {f['value']}")
+                st.write(f"{webname} {f['op']} {f['value']}")
             with cols[1]:
                 if st.button(f"Remove {i+1}", key=f"remove_filter_{i}"):
                     st.session_state.filters.pop(i)
@@ -112,7 +112,7 @@ def render_filter_selector(plot_query: str, param: str, whitelist: dict, whiteli
     else:
         st.info("No filters added yet.")
 
-def render_sort_selector(plot_query: str, param: str, whitelist: dict, whitelisted_webnames: list):
+def render_sort_selector(param: str, whitelist: dict, whitelisted_webnames: list):
     """Render sort selector UI components"""
     if "sort_fields" not in st.session_state:
         st.session_state.sort_fields = []
@@ -162,11 +162,11 @@ def render_aggregation_selector(param: str, options: dict, whitelist: dict, whit
         # HAVING Section (only shown if aggregation is selected)
         if "parameters" in options and "having" in options["parameters"]:
             st.markdown("##### Having condition (optional)")
-            having_operator = st.selectbox("Operator", 
+            having_op = st.selectbox("Operator", 
                                          ["---Please select---"] + ["=", ">", "<", ">=", "<=", "BETWEEN"], 
                                          key=f"having_op_{param}")
             
-            if having_operator != "---Please select---":
+            if having_op != "---Please select---":
                 having_value = st.number_input("Value", step=1, key=f"having_val_{param}")
         
         # Add buttons
@@ -185,7 +185,7 @@ def render_aggregation_selector(param: str, options: dict, whitelist: dict, whit
         if "parameters" in options and "having" in options["parameters"]:
             with col2:
                 if st.button("Add with HAVING", key=f"add_agg_having_{param}"):
-                    if having_operator != "---Please select---" and "having_value" in locals():
+                    if having_op != "---Please select---" and "having_value" in locals():
                         st.session_state.aggregation_havings.append({
                             "aggregation": {
                                 "field": aggregation_field,
@@ -193,7 +193,7 @@ def render_aggregation_selector(param: str, options: dict, whitelist: dict, whit
                             },
                             "having": {
                                 "field": aggregation_field,
-                                "operator": having_operator,
+                                "op": having_op,
                                 "value": having_value
                             }
                         })
@@ -211,7 +211,7 @@ def render_aggregation_selector(param: str, options: dict, whitelist: dict, whit
                 agg = entry["aggregation"]
                 if "having" in entry:
                     having = entry["having"]
-                    st.write(f"{agg['function']}({agg['field']}) HAVING {having['operator']} {having['value']}")
+                    st.write(f"{agg['function']}({agg['field']}) HAVING {having['op']} {having['value']}")
                 else:
                     st.write(f"{agg['function']}({agg['field']})")
             with cols[1]:
@@ -245,7 +245,7 @@ def render_options(plot_query: str, combined_parameters: dict, whitelist: dict, 
             render_filter_selector(plot_query, param, whitelist, whitelisted_webnames)
             
         elif options["input_type"] == "sort_selector":
-            render_sort_selector(plot_query, param, whitelist, whitelisted_webnames)
+            render_sort_selector(param, whitelist, whitelisted_webnames)
             
         elif options["input_type"] == "aggregation_selector":
             render_aggregation_selector(param, options, whitelist, whitelisted_webnames)
@@ -308,7 +308,7 @@ def show():
             "query_settings": {
                 "filters": st.session_state.get("filters", []),
                 "aggregation_havings": st.session_state.get("aggregation_havings", []),
-                "sort": st.session_state.get("sort_fields", []),
+                "sort_fields": st.session_state.get("sort_fields", []),
                 "group_by": st.session_state.get("group_by", []),
                 "limit": st.session_state.get("limit", None),
                 "offset": st.session_state.get("offset", None)

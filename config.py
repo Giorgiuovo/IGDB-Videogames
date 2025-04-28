@@ -16,4 +16,7 @@ DB_PATH = DATA_PATH / "games.sqlite"
 QUERY_WHITELIST_PATH = DATA_PATH / "db_query_whitelist.json"
 
 PRESET_PATH = DATA_PATH / "presets"
+DEFAULT_PRESET_PATH = DATA_PATH / "presets" / "Unsaved preset.json"
 CHART_TYPES_PATH = DATA_PATH / "chart_types.json"
+
+PLOTS_PATH = Path(__file__).resolve().parent / "visualization" / "plots.py"

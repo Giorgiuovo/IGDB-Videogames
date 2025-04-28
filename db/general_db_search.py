@@ -54,7 +54,7 @@ Having = list[HavingCondition]
 
 def validate_get_data_input(
     fields: list[str],
-    sort_field: Optional[str],
+    sort_fields: Optional[list[dict[str, str]]],
     filters: Filters,
     aggregation: Optional[Aggregation] = None,
     group_by: Optional[GroupBy] = None,
@@ -72,12 +72,16 @@ def validate_get_data_input(
         whitelist = json.load(f)
         allowed_fields = set(whitelist)
 
-        if sort_field and sort_field not in allowed_fields:
-            raise ValueError(f"Sort-field '{sort_field}' not allowed")
-
         for field in fields:
             if field not in allowed_fields:
                 raise ValueError(f"Field '{field}' not allowed")
+            
+        if sort_fields:
+            for sort_field in sort_fields:
+                if sort_field["field"] not in allowed_fields:
+                    raise ValueError(f"Sort-field '{sort_field['field']}' not allowed")
+                if sort_field["direction"] not in ["ASC", "DESC"]:
+                    raise ValueError(f"Sort-direction {sort_field['direction']} not allowed")
 
         if filters:
             for f in filters:
@@ -159,7 +163,7 @@ def build_select_clause(fields: list[str], aggregation: Optional[Aggregation], g
         select_lines.append("*")
     else:
         # Only add fields that aren't in group_by (added automatically)
-        group_by_set = set(group_by) if group_by else set()
+        group_by_set = set(str(g) for g in group_by) if group_by else set()
         select_lines.extend(f for f in fields if f not in group_by_set)
     
     # Handle aggregations
@@ -224,10 +228,21 @@ def build_having_clause(having: Having) -> tuple[list[str], list[Union[int, floa
 
     return having_clauses, params
 
+def build_order_by_clause(sort_fields):
+    """Build ORDER BY clause from processed sort fields"""
+    if not sort_fields:
+        return ""
+    
+    order_parts = []
+    for sort_field in sort_fields:
+        order_parts.append(f"{sort_field['field']} {'ASC' if sort_field['direction'] == 'ASC' else 'DESC'}")
+    
+    return f"ORDER BY {', '.join(order_parts)}"
+
 def get_data(
     conn,
     fields: list[str],
-    sort_field: Optional[tuple[str, bool]] = None,
+    sort_fields: Optional[list[dict[str, str]]] = None,
     filters: Optional[Filters] = None,
     df: bool = True,
     aggregation: Optional[Aggregation] = None,
@@ -244,9 +259,9 @@ def get_data(
         conn: SQLite connection object.
         fields (list[str]): List of database fields to select.
                            Example: ["name", "release_date"] or ["*"] to select all fields.
-        sort_field (Optional[tuple[str, bool]]): Tuple of (field name, ascending/descending).
-                           Example: ("release_date", True) for ascending order,
-                           or ("release_date", False) for descending order.
+        sort_fields (Optional[list[dict[int: str, bool]]]): List of dicts of sort fields with keys beeing the sort index.
+                           Example: (0: ("release_date", True)) for ascending order,
+                           or (0: ("release_date", False)) for descending order.
         filters (Optional[list[FilterCondition]]): Conditions for the WHERE clause.
                            Example: [{"field": "release_date", "op": ">", "value": 2010}].
         df (bool): If True, returns a pandas dataframe (instead of executing it and returning the dict).
@@ -255,11 +270,11 @@ def get_data(
                            {
                                "game_count": {"field": "games.id", "function": "COUNT"}
                            }
+        having (Optional[Having]): Conditions on aggregated values (HAVING clause).
+                           Example: [{"field": "game_count", "op": ">", "value": 10}].
         group_by (Optional[GroupBy]): List of fields to group by.
                            Example: ["genre"].
         limit (Optional[int]): Maximum number of rows to return.
-        having (Optional[Having]): Conditions on aggregated values (HAVING clause).
-                           Example: [{"field": "game_count", "op": ">", "value": 10}].
         offset (Optional[int]): Number of rows to skip (for pagination).
 
     Returns:
@@ -283,19 +298,20 @@ def get_data(
             limit=5
         )
     """
-    
     filters = filters or []
     aggregation = aggregation or {}
     group_by = group_by or []
+    sort_fields = sort_fields or []
     having = having or []
     offset = offset or 0
 
-    sort_field_name = sort_field[0] if sort_field else None
-    asc_dsc = sort_field[1] if sort_field else True
+    validate_get_data_input(fields, sort_fields, filters, aggregation, group_by, limit, having, offset)
 
-    validate_get_data_input(fields, sort_field_name, filters, aggregation, group_by, limit, having, offset)
-
-    used_fields = set(fields) | {f['field'] for f in filters} | set(group_by) | {v['field'] for v in aggregation.values()}
+    used_fields = (set(str(f) for f in fields) 
+                   | {str(f['field']) for f in filters} 
+                   | set(str(g) for g in group_by) 
+                   | set(str(v['field']) for v in aggregation.values())
+                   | set(str(v["field"]) for v in sort_fields))
     mapping = helpers.load_mapping(config.DB_MAPPING_PATH)
     field_table_map = {e[0]: e[1] for e in mapping}
     field_table_map["languages.name"] = "languages"
@@ -307,7 +323,7 @@ def get_data(
     params.extend(having_params)
 
     full_select = select_lines + join_selects
-    sort_line = f"{sort_field_name} {'ASC' if asc_dsc else 'DESC'}" if sort_field_name else ""
+    sort_line = build_order_by_clause(sort_fields)
 
     query = f"""
     SELECT {", ".join(full_select)}
@@ -341,12 +357,6 @@ def get_data(
             raise e
     else:
         df = pd.read_sql_query(query, conn, params=params)
-
-        with open(config.QUERY_WHITELIST_PATH, "r", encoding="utf-8") as f:
-            whitelist = json.load(f)
-            for col in df.columns:
-                if col in whitelist and whitelist[col]["type"] == "datetime":
-                    df[col] = pd.to_datetime(df[col], unit='s')
         return df
 
 
