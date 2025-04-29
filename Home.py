@@ -1,12 +1,7 @@
 import config
 import json
-from pathlib import Path
 import streamlit as st
-import plotly.express as px
-import plotly.graph_objects as go
 import importlib
-import pandas as pd
-import visualization.plots as plots
 from streamlit.runtime.caching import cache_resource
 from db.db_helpers import get_connection
 import db.general_db_search as db_search
@@ -16,26 +11,37 @@ import json
 
 def build_chart_args(plot_type, plot_settings, query_settings, chart_types_config):
     params = {}
-
-    # Alle möglichen Parameter für diesen Chart aus chart_types.json
-    chart_config = chart_types_config["plots"].get(plot_type)
+    
+    chart_config = chart_types_config["plots"].get(plot_type, {})
     if not chart_config:
         return params
 
-    # Constructor-Argumente der Plot-Klasse holen:
-    constructor_args = inspect.signature(get_chart_class(plot_type).__init__).parameters
+    # Get constructor parameters
+    ChartClass = get_chart_class(plot_type)
+    if not ChartClass:
+        return params
+        
+    constructor_args = inspect.signature(ChartClass.__init__).parameters
 
-    # Die Parameter aus chart_types.json ("plot" und "query") abgleichen:
-    for section in ["plot", "query"]:
-        section_params = chart_config.get("parameters", {}).get(section, {})
-        for param_name in section_params:
-            if param_name in constructor_args:
-                # Zuerst plot_settings, dann query_settings durchsuchen:
-                value = plot_settings.get(param_name) if section == "plot" else query_settings.get(param_name)
-                if value is not None:
-                    params[param_name] = value
+    # Handle plot settings
+    plot_params = chart_config.get("parameters", {}).get("plot", {})
+    for param_name, param_config in plot_params.items():
+        if param_name in constructor_args:
+            value = plot_settings.get(param_name)
+            if value is not None:
+                params[param_name] = value
+
+
+    # Handle query settings
+    query_params = chart_config.get("parameters", {}).get("query", {})
+    for param_name, param_config in query_params.items():
+        if param_name in constructor_args:
+            value = query_settings.get(param_name)
+            if value is not None:
+                params[param_name] = value
 
     return params
+
 
 def empty_json(path):
     with open(path, "w", encoding="utf-8") as f:
@@ -62,11 +68,37 @@ def show():
 
     conn = get_db_connection()
 
-    presets, middle_space, search = st.columns([0.15, 0.7, 0.15])
+    presets, reset, save_col, text_input = st.columns([0.15, 0.12, 0.12, 0.61])
 
     # initialise session state
     if "preset" not in st.session_state:
         st.session_state.preset = "Unsaved preset"
+
+    with reset:
+        if st.session_state.preset != "Unsaved preset" and st.button("Delete preset"):
+            (config.PRESET_PATH / f"{st.session_state.preset}.json").unlink()
+            st.session_state.preset = "Unsaved preset"
+            st.rerun()
+        elif st.button("Reset plots"):
+            empty_json(config.DEFAULT_PRESET_PATH)
+            st.rerun()
+
+    with text_input:
+        new_preset_name = st.text_input("Save as:", key="new_preset_name")
+    with save_col:
+        if st.button("Save preset"):
+            if new_preset_name:
+                unsaved_path = config.DEFAULT_PRESET_PATH
+                new_path = config.PRESET_PATH / f"{new_preset_name}.json"
+                with open(unsaved_path, "r", encoding="utf-8") as src:
+                    data = json.load(src)
+                with open(new_path, "w", encoding="utf-8") as dst:
+                    json.dump(data, dst, indent=4)
+                st.session_state.preset = new_preset_name
+                st.success(f"Preset saved as '{new_preset_name}'")
+                st.rerun()
+            else:
+                st.error("Please enter a name to save the preset.")
 
     with presets:
         # List of available presets
@@ -86,13 +118,15 @@ def show():
             data = json.load(f)
     except json.JSONDecodeError:
         st.error("Invalid JSON in preset file. Resetting to default.")
-        empty_json(config.PRESET_PATH / f"{config.DEFAULT_PRESET_PATH}.json")
+        empty_json(config.DEFAULT_PRESET_PATH)
         st.session_state.preset = "Unsaved preset"
+        (config.PRESET_PATH / f"{st.session_state.preset}.json").unlink()
         data = {}
     except FileNotFoundError:
         st.error("Preset file not found. Resetting to default.")
-        empty_json(config.PRESET_PATH / f"{config.DEFAULT_PRESET_PATH}.json")
+        empty_json(config.DEFAULT_PRESET_PATH)
         st.session_state.preset = "Unsaved preset"
+        (config.PRESET_PATH / f"{st.session_state.preset}.json").unlink()
         data = {}
 
     st.session_state.pos = len(list(data.keys()))
@@ -110,10 +144,11 @@ def show():
         if ChartClass is None:
             continue
 
-        # Build constructor args dynamisch:
         chart_args = build_chart_args(plot_type, plot_settings, query_settings, chart_types_config)
+
+        if "aggregation" not in chart_args:
+            chart_args["aggregation"] = query_settings.get("aggregation", {})
         
-        # Zusätzliche Pflicht-Args (conn, cursor) ergänzen:
         chart_instance = ChartClass(
             conn=conn,
             **chart_args
@@ -123,20 +158,21 @@ def show():
         st.plotly_chart(fig, use_container_width=True, key=f"{uuid.uuid4()}")
 
 
-    add_page_link, rightspace = st.columns([0.2, 0.8])
+    add_page_link, remove_last, rightspace = st.columns([0.15, 0.15, 0.7])
     with add_page_link:
         # add button
         st.page_link("pages/Add Plot.py", label="Add new plot", icon="➕", use_container_width=True)
-        # reset button
-        if st.session_state.preset != "Unsaved preset":
-                if st.button("Delete preset"):
-                    (config.PRESET_PATH / f"{st.session_state.preset}.json").unlink()
-                    st.session_state.preset = "Unsaved preset"
-                    st.rerun()
-        else:
-            if st.button("Reset plots"):
-                empty_json(config.DEFAULT_PRESET_PATH)
-                st.rerun()
+        
+    with remove_last:
+        if st.button("Remove last plot"):
+            with open((config.PRESET_PATH / f"{st.session_state.preset}.json"), "r") as f:
+                data = json.load(f)
+
+            last_key = str(max(map(int, data.keys())))
+            del data[last_key]
+
+            with open((config.PRESET_PATH / f"{st.session_state.preset}.json"), "w") as f:
+                json.dump(data, f, indent=4)
 
 if __name__ == "__main__":
     show()

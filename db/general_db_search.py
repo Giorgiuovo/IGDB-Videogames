@@ -46,11 +46,16 @@ GroupBy = list[str]
 
 # Having:
 class HavingCondition(TypedDict):
-    field: str  # Muss Aggregation-Alias sein!
+    aggregation: str  # Von 'field' zu 'aggregation' ändern
     op: Literal["=", "!=", "<", "<=", ">", ">="]
     value: Union[int, float]
 
 Having = list[HavingCondition]
+
+def is_aggregation_field(field: str) -> bool:
+    """Check if field is an aggregation expression like 'AVG(games.rating)'"""
+    aggregation_functions = ["SUM", "AVG", "COUNT", "MIN", "MAX"]
+    return any(field.upper().startswith(f"{func}(") for func in aggregation_functions)
 
 def validate_get_data_input(
     fields: list[str],
@@ -73,13 +78,27 @@ def validate_get_data_input(
         allowed_fields = set(whitelist)
 
         for field in fields:
+            # Skip validation for aggregation fields like "AVG(games.rating)"
+            if is_aggregation_field(field):
+                continue
+
+            # Skip if field is an aggregation alias
+            if aggregation and field in aggregation:
+                continue
+
             if field not in allowed_fields:
                 raise ValueError(f"Field '{field}' not allowed")
+
             
         if sort_fields:
             for sort_field in sort_fields:
-                if sort_field["field"] not in allowed_fields:
-                    raise ValueError(f"Sort-field '{sort_field['field']}' not allowed")
+                field = sort_field["field"]
+                # Skip validation for aggregation fields in sort
+                if is_aggregation_field(field):
+                    continue
+                    
+                if field not in allowed_fields:
+                    raise ValueError(f"Sort-field '{field}' not allowed")
                 if sort_field["direction"] not in ["ASC", "DESC"]:
                     raise ValueError(f"Sort-direction {sort_field['direction']} not allowed")
 
@@ -89,6 +108,10 @@ def validate_get_data_input(
                 op = f["op"]
                 value = f["value"]
 
+                # Skip validation for aggregation fields in filters
+                if is_aggregation_field(field):
+                    continue
+                    
                 if field not in allowed_fields:
                     raise ValueError(f"Filter field '{field}' not allowed")
 
@@ -126,6 +149,10 @@ def validate_get_data_input(
 
         if aggregation:
             for alias, agg_def in aggregation.items():
+                # Skip validation if field is an aggregation expression
+                if is_aggregation_field(agg_def["field"]):
+                    continue
+                    
                 if agg_def["field"] not in allowed_fields:
                     raise ValueError(f"Aggregation field '{agg_def['field']}' not allowed")
                 if agg_def["function"].upper() not in ("SUM", "AVG", "COUNT", "MIN", "MAX"):
@@ -133,17 +160,21 @@ def validate_get_data_input(
 
         if group_by:
             for g in group_by:
+                # Skip validation for aggregation fields in group_by
+                if is_aggregation_field(g):
+                    continue
+                    
                 if g not in allowed_fields:
                     raise ValueError(f"Group by field '{g}' not allowed")
 
         if having:
             for condition in having:
-                field = condition["field"]
+                aggregation_alias = condition["aggregation"]  # Direkter Zugriff auf 'aggregation'
                 op = condition["op"]
                 val = condition["value"]
 
-                if field not in aggregation:
-                    raise ValueError(f"HAVING field '{field}' must match an aggregation alias")
+                if aggregation_alias not in aggregation:
+                    raise ValueError(f"HAVING aggregation '{aggregation_alias}' must match an aggregation alias")
                 if op not in ("=", "!=", "<", "<=", ">", ">="):
                     raise ValueError(f"HAVING operator '{op}' not supported")
                 if not isinstance(val, (int, float)):
@@ -164,7 +195,9 @@ def build_select_clause(fields: list[str], aggregation: Optional[Aggregation], g
     else:
         # Only add fields that aren't in group_by (added automatically)
         group_by_set = set(str(g) for g in group_by) if group_by else set()
-        select_lines.extend(f for f in fields if f not in group_by_set)
+        select_lines.extend(
+            f"{field} AS \"{field}\"" for field in fields if field not in group_by_set
+        )
     
     # Handle aggregations
     if aggregation:
@@ -189,7 +222,8 @@ def build_join_clause(used_fields: set[str], field_table_map: dict[str, str]) ->
             f"LEFT JOIN games_{join_base} ON games.id = games_{join_base}.game_id\n"
             f"LEFT JOIN {join_base} ON games_{join_base}.{join_base}_id = {join_base}.id"
         )
-        additional_selects.append(f"GROUP_CONCAT(DISTINCT {join_base}.name) as {join_base}")
+        if f"{join_base}.name" not in used_fields:
+            additional_selects.append(f"GROUP_CONCAT(DISTINCT {join_base}.name) AS \"{join_base}.name\"")
 
     return join_lines, additional_selects
 
@@ -220,10 +254,10 @@ def build_having_clause(having: Having) -> tuple[list[str], list[Union[int, floa
     params = []
 
     for condition in having:
-        field = condition["field"]
+        aggregation_alias = condition["aggregation"]  # Direkter Zugriff auf 'aggregation'
         op = condition["op"]
         val = condition["value"]
-        having_clauses.append(f"{field} {op} ?")
+        having_clauses.append(f"{aggregation_alias} {op} ?")
         params.append(val)
 
     return having_clauses, params
@@ -307,11 +341,19 @@ def get_data(
 
     validate_get_data_input(fields, sort_fields, filters, aggregation, group_by, limit, having, offset)
 
-    used_fields = (set(str(f) for f in fields) 
-                   | {str(f['field']) for f in filters} 
-                   | set(str(g) for g in group_by) 
-                   | set(str(v['field']) for v in aggregation.values())
-                   | set(str(v["field"]) for v in sort_fields))
+    aggregation_fields = {agg["field"] for agg in aggregation.values()}
+    aggregation_aliases = set(aggregation.keys())
+
+    used_fields = (
+        {str(f) for f in fields}
+        | {str(f['field']) for f in filters}
+        | set(str(g) for g in group_by)
+        | aggregation_fields
+        | {str(v["field"]) for v in sort_fields}
+    )
+
+    used_fields -= aggregation_aliases
+
     mapping = helpers.load_mapping(config.DB_MAPPING_PATH)
     field_table_map = {e[0]: e[1] for e in mapping}
     field_table_map["languages.name"] = "languages"

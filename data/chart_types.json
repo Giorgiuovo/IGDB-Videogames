@@ -1,5 +1,4 @@
 {
-  "version": "1.0",
   "plots": {
     "basic": {
       "parameters": {
@@ -10,34 +9,69 @@
           "sort_fields": {"required": false, "label": "Sort by", "input_type": "sort_selector"},
           "filters": {"required": false, "label": "Filter by", "input_type": "filter_selector"},
           "group_by": {"required": false, "label": "Group by", "input_type": "field_list_selector"},
-          "aggregation": {
-            "required": false, 
-            "label": "Aggregate by", 
-            "input_type": "aggregation_selector",
-            "parameters": {
-              "having": {
-                "required": false,
-                "label": "Having condition",
-                "input_type": "having_selector"
-              }
-            }
-          },
           "limit": {"required": false, "label": "Limit", "input_type": "number_input"},
           "offset": {"required": false, "label": "Offset", "input_type": "number_input"}
         }
       }
     },
-    "line_chart": {
+    "LineChart": {
       "web_name": "Line Chart 📈",
       "parameters": {
         "plot": {
+          "title": {"required": false, "label": "Chart Title", "input_type": "text_input"},
           "x_label": {"required": false, "label": "X-axis label", "input_type": "text_input"},
           "x": {"required": true, "label": "X-axis field*", "input_type": "field_selector"},
           "y_label": {"required": false, "label": "Y-axis label", "input_type": "text_input"},
           "y": {"required": true, "label": "Y-axis field*", "input_type": "field_selector"},
-          "trendline": {"required": false, "label": "Trendline", "input_type": "checkbox"}
+          "trendline": {"required": false, "label": "Show trendline", "input_type": "checkbox"}
         },
-        "query": {}
+        "query": {
+          "having": {"required": false, "label": "Having conditions", "input_type": "having_selector"}
+        }
+      }
+    },
+    "BarChart": {
+      "web_name": "Bar Chart 📊",
+      "parameters": {
+        "plot": {
+          "title": {"required": false, "label": "Chart Title", "input_type": "text_input"},
+          "x_label": {"required": false, "label": "X-axis label", "input_type": "text_input"},
+          "x": {"required": true, "label": "X-axis field*", "input_type": "field_selector"},
+          "y_label": {"required": false, "label": "Y-axis label", "input_type": "text_input"},
+          "y": {"required": true, "label": "Y-axis field*", "input_type": "field_selector"},
+          "orientation": {"required": false, "label": "Horizontal bars", "input_type": "checkbox"}
+        },
+        "query": {
+          "having": {"required": false, "label": "Having conditions", "input_type": "having_selector"}
+        }
+      }
+    },
+    "PieChart": {
+      "web_name": "Pie Chart 🥧",
+      "parameters": {
+        "plot": {
+          "title": {"required": false, "label": "Chart Title", "input_type": "text_input"},
+          "labels": {"required": true, "label": "Labels field*", "input_type": "field_selector"},
+          "values": {"required": true, "label": "Values field*", "input_type": "field_selector"}
+        },
+        "query": {
+          "having": {"required": false, "label": "Having conditions", "input_type": "having_selector"}
+        }
+      }
+    },
+    "ScatterPlot": {
+      "web_name": "Scatter Plot ⚫",
+      "parameters": {
+        "plot": {
+          "title": {"required": false, "label": "Chart Title", "input_type": "text_input"},
+          "x_label": {"required": false, "label": "X-axis label", "input_type": "text_input"},
+          "x": {"required": true, "label": "X-axis field*", "input_type": "field_selector"},
+          "y_label": {"required": false, "label": "Y-axis label", "input_type": "text_input"},
+          "y": {"required": true, "label": "Y-axis field*", "input_type": "field_selector"}
+        },
+        "query": {
+          "having": {"required": false, "label": "Having conditions", "input_type": "having_selector"}
+        }
       }
     }
   }
