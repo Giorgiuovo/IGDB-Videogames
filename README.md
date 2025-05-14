@@ -1,6 +1,6 @@
-# SELECT * FROM games
+# Query The Games
 
-SELECT * FROM games is a local-first data visualization app for exploring and analyzing video game data fetched from the IGDB API. It combines a fully configurable SQL query engine with interactive Plotly charts – all inside a Streamlit interface.
+Query The Games is a local-first data visualization app for exploring and analyzing video game data fetched from the IGDB API. It combines a fully configurable SQL query engine with interactive Plotly charts – all inside a Streamlit interface.
 
 ## Features
 
