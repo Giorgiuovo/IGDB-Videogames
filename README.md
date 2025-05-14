@@ -89,6 +89,7 @@ web/            - Preset handling, config tools, helpers
 config.py       - Shared config
 igdb_api_config.py - IGDB credentials (not tracked)
 requirements.txt   - Required packages
+Home.py         - Streamlit Homepage
 ```
 
 ## Requirements
